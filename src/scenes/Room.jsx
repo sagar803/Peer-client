@@ -96,8 +96,10 @@ export const Room = ({user}) => {
     }
 
     const handleOnlineUsers = ({onlineUsers}) => {
+      console.log(onlineUsers)
       //online user is an array and each element is itself an array where onlineUser[0] is socket id and onlineUser[1] is an object with name and email
-      setOnlineUsers(onlineUsers);
+      const updatedOnlineUsers = onlineUsers.filter(onlineUser => onlineUser[0] !== user.id);
+      setOnlineUsers(updatedOnlineUsers);
     }
     useEffect(() => {
       socket.emit("new-user-online", {})
