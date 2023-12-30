@@ -9,8 +9,8 @@ export const OnlineUserList = ({ onlineUsers, handleCallUser }) => {
       <div className={styles.listContainer}>
         {onlineUsers && onlineUsers.length > 0 ? (
           onlineUsers.map((user) => (
-            <button key={user[0]} className={styles.callButton} onClick={() => handleCallUser(user)}>
-              <PhoneCall /> {user[1].name}
+            <button key={user.socketId} className={styles.callButton} onClick={() => handleCallUser(user)}>
+              <PhoneCall /> {user.user.name}
             </button>
           ))
         ) : (

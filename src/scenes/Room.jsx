@@ -7,7 +7,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import styles from './Room.module.css'
 import { OnlineUserList } from '../components/OnlineUserList';
 import { Player } from '../components/Player';
-import logo from '../asset/logo.jpg'
 import { User } from 'react-feather';
 
 export const Room = ({user}) => {
@@ -20,6 +19,10 @@ export const Room = ({user}) => {
     const [myStream, setMyStream] = useState(null);    
     const [connected, setConnected] = useState(false);
     const [onlineUsers, setOnlineUsers] = useState({});
+    const [connectedUser, setConnectedUser] = useState({});
+
+    console.log("sender: " + peer.getSenders())
+
     if(!user){
       navigate('/');
     }
@@ -51,40 +54,50 @@ export const Room = ({user}) => {
     };
   
     const handleCallUser = useCallback(async (user) => {
-      const remoteSocketId = user[0];
-      const remoteEmail = user[1].email;
+      const remoteSocketId = user.socketId;
+/*
       const sendChannel = peer.createDataChannel('channel');
       peer.channel = sendChannel;
-
       sendChannel.onopen = () => alert('Connected');
       sendChannel.onclose = () => alert('Disconnected');
-
-      console.log('calling')
+*/
       await createOffer();
-      //  A pause of 1 second is taken because the icecandidates are changing again and again, and to let it settle 1 second pause is taken
-      //  peer.onicecandidate = (e) => setOffer(JSON.stringify(peer.localDescription));
+      /*
+        A pause of 1 second is taken because the icecandidates are changing again and again, and to let it settle 1 second pause is taken
+        peer.onicecandidate = (e) => setOffer(JSON.stringify(peer.localDescription));
+        
+        peer.onicecandidate = (event) => {
+          if(peer.setRemoteDescription){
+            if(event.candidate) {
+              socket.emit('ice-candidate', { to : remoteSocketId , candidate: event.candidate})
+            }
+          }
+        }
+      */
       await new Promise(resolve => setTimeout(resolve, 1000));
       socket.emit('call_user', { to: remoteSocketId, offer: peer.localDescription });
-
     }, [socket]);
 
-    const handleIncomingCall = useCallback(async ({ from, offer, name }) => {
-      console.log('incomming')
+    const handleIncomingCall = useCallback(async ({ from, offer, userData }) => {
+      console.log('incomming call');
       const userResponse = window.confirm("Accept Incomming Video Call");
-      toast(`Incomming Call from ${name}`, { autoClose: 4000 });
+      toast(`Incomming Call from ${userData.name}`, { autoClose: 4000 });
       if(userResponse){
-        setRemoteEmail(name);
-        setConnected(true)
+        setConnectedUser({socketId: from , userData});
+        setConnected(true);
+        /*
         peer.ondatachannel = (e) => {
           const receiveChannel = e.channel;
           receiveChannel.onopen = () => alert('Connected');
           receiveChannel.onclose = () => alert('Disconnected');
           peer.channel = receiveChannel;
         };
+        */
         const ans = await createAnswer(offer);
-        socket.emit('call_accepted', { to: from, ans });
+        socket.emit('call_accepted', { to: from, ans , user});
       }
       else {
+        socket.emit('call_rejected', { to: from, user});
         console.log("rejected")
       }
     }, [socket]);
@@ -93,14 +106,40 @@ export const Room = ({user}) => {
       await peer.setRemoteDescription(ans);
       console.log('Call got accepted');
       setConnected(true)
+      setConnectedUser({socketId: from , user});
     }
 
-    const handleOnlineUsers = ({onlineUsers}) => {
-      console.log(onlineUsers)
-      //online user is an array and each element is itself an array where onlineUser[0] is socket id and onlineUser[1] is an object with name and email
-      const updatedOnlineUsers = onlineUsers.filter(onlineUser => onlineUser[0] !== user.id);
+    const handleOnlineUsers = ({ onlineUsers }) => {
+      console.log(onlineUsers);  
+      // onlineUsers is an array where each element is an object with socketId and user
+      const updatedOnlineUsers = onlineUsers.filter(({ socketId }) => socketId !== user.id);
       setOnlineUsers(updatedOnlineUsers);
     }
+
+    const handleEndCall = () => {
+      socket.emit('end_call', {to: connectedUser.socketId});
+      setConnected(false);
+      setConnectedUser({});
+      peer.getSenders().forEach(sender => peer.removeTrack(sender))
+//            closeConnection();
+    }
+
+    const handelDisconnection = () => {
+      setConnected(false);
+      setConnectedUser({});
+      peer.getSenders().forEach(sender => peer.removeTrack(sender))
+//      closeConnection();
+    }
+    /*
+    const handleIceCandidate = ({from , candidate}) => {
+      console.log(candidate)
+      if(peer.remoteDescription){
+        if(candidate){
+          peer.addIceCandidate(new RTCIceCandidate(candidate));
+        }
+      }
+    }
+    */
     useEffect(() => {
       socket.emit("new-user-online", {})
     },[])
@@ -109,22 +148,18 @@ export const Room = ({user}) => {
         socket.on('user_joined', handleNewUserJoin);
         socket.on('incomming_call', handleIncomingCall);
         socket.on('call_accepted', handleCallAccepted);
+        socket.on('call_disconnected', handelDisconnection);
+        //        socket.on('ice-candidate', handleIceCandidate);
 
         return () => {
           socket.off('online-users', handleOnlineUsers);
           socket.off('user_joined', handleNewUserJoin);
           socket.off('incomming_call', handleIncomingCall);
           socket.off('call_accepted', handleCallAccepted);        
+          socket.off('call_disconnected', handelDisconnection);
+          //          socket.off('ice-candidate', handleIceCandidate);
         }
       }, [socket,handleNewUserJoin, handleIncomingCall,  handleCallAccepted])
-      
-    const handleEndCall = () => {
-      setConnected(false);
-      closeConnection();
-      navigate('/');
-      navigate(0);
-//      socket.emit('end-call', {to: remoteSocketId});
-    }
   
   return (
       <div className={styles.room} >
@@ -140,11 +175,11 @@ export const Room = ({user}) => {
               </>
             ) : (
               <>
-                <div className='streams_container'>
+                <div className={styles.streamContainer}>
                     {remoteStream && <Player stream={remoteStream} email={remoteEmail} muted={false}/>}
                     {myStream && <Player stream={myStream} email={"My Stream"} muted={true}/>}
                 </div>
-                <button onClick={handleEndCall} className='button end-call-button'>Disconnect</button>
+                <button onClick={handleEndCall} className={styles.endCallbutton}>Disconnect</button>
               </>
             )
           }

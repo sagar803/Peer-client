@@ -13,7 +13,7 @@ export const Player = (props) => {
         <div className={styles.stream}>
             <p>{email}</p>
             <i onClick={handleMute}  >
-            { mute ? <VolumeX strokeWidth='1px'/> : <Volume2 strokeWidth='1px'/> }
+                { mute ? <VolumeX strokeWidth='1px'/> : <Volume2 strokeWidth='1px'/> }
             </i>              
             <ReactPlayer
                 className={styles.videoPlayer}

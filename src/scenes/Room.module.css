@@ -31,11 +31,12 @@
 .main{
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.streams_container {
+.streamContainer {
   padding: 50px 0 ;
   width: 100%;
   display: flex;
@@ -43,23 +44,36 @@
   align-items: center;
 }
 
+.endCallbutton{
+  height: 50px;
+  align-items: center;
+  gap: 10px;
+  vertical-align: center;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  font-weight: 500;
+  color: #000;
+  border: none;
+  border-radius: 45px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease 0s;
+  cursor: pointer;
+  outline: none;
+  margin: 15px 0;
+  width: 150px;
+  background-color: rgb(255, 142, 142);
+}  
+.endCallbutton:hover{
+  background-color: red;
+  box-shadow: 0px 15px 20px rgb(255, 142, 142);
+  color: #fff;
+  transform: translateY(-7px);    
+}
 
-
-  
-  .end-call-button{
-    background-color: rgb(255, 142, 142);
+@media (max-width: 900px) {
+  .streamContainer {
+      flex-direction: column;
+      padding: 0;
   }
-  
-  .end-call-button:hover{
-    background-color: red;
-    box-shadow: 0px 15px 20px rgb(255, 142, 142);
-    color: #fff;
-    transform: translateY(-7px);    
-  }
-
-  @media (max-width: 900px) {
-    .streams_container {
-        flex-direction: column;
-        padding: 0;
-    }
-  }
+}
