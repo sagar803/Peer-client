@@ -12,14 +12,12 @@ function App() {
     <div className="App">
       <SocketProvider>
         <BrowserRouter>      
-        <PeerProvider>
+          <PeerProvider>
             <Routes>
               <Route path='/' element={<Home setUser={setUser}  />} />
               <Route path='/room' element={<Room user={user} />} />
             </Routes>
-
-        </PeerProvider>
-
+          </PeerProvider>
         </BrowserRouter>
       </SocketProvider>
     </div>

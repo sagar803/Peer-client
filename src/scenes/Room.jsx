@@ -163,15 +163,24 @@ export const Room = ({user}) => {
           {
             !connected ? (
               <>
-                <OnlineUserList onlineUsers={onlineUsers} handleCallUser={handleCallUser}/>
+                <div className={styles.cta}>
+                    <div className={styles.metaData}>
+                      <h1>Seamless Connections, Anytime, Anywhere! 🚀 </h1>
+                    </div>
+                    <div className={styles.userListContainer}>
+                      <OnlineUserList onlineUsers={onlineUsers} handleCallUser={handleCallUser}/>
+                    </div>
+                </div>
               </>
             ) : (
               <>
-                <div className={styles.streamContainer}>
-                    {remoteStream && <Player stream={remoteStream} email={connectedUser?.user?.name} muted={false}/>}
-                    {myStream && <Player stream={myStream} email={"My Stream"} muted={true}/>}
+                <div className={styles.videoCall}>
+                  <div className={styles.streamContainer}>
+                      {remoteStream && <Player stream={remoteStream} email={connectedUser?.user?.name} muted={false}/>}
+                      {myStream && <Player stream={myStream} email={"My Stream"} muted={true}/>}
+                  </div>
+                  <button onClick={handleEndCall} className={styles.endCallbutton}>Disconnect</button>
                 </div>
-                <button onClick={handleEndCall} className={styles.endCallbutton}>Disconnect</button>
               </>
             )
           }

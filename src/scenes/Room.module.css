@@ -30,12 +30,36 @@
 }
 .main{
   width: 100%;
+}
+
+
+.cta{
+  width: 100%;
+  padding: 60px;
+  min-height: 80vh;
+  display: flex;
+  flex-direction: row;
+  box-sizing: border-box;
+  align-items: center;
+  gap: 50px;
+  justify-content: center;
+}
+.metaData{
+  flex-basis: 70%;
+  font-size: 50px;
+}
+.userListContainer{
+  flex-basis: 30%;
+}
+
+/* ON CALL CALL SECION */
+.videoCall{
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
-
 .streamContainer {
   padding: 50px 0 ;
   width: 100%;
@@ -72,6 +96,14 @@
 }
 
 @media (max-width: 900px) {
+  .cta{
+    padding: 30px;
+    flex-direction: column;
+  }
+  .metaData{
+    font-size: 20px;
+  }
+
   .streamContainer {
       flex-direction: column;
       padding: 0;
