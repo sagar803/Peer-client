@@ -4,8 +4,7 @@ import { io } from "socket.io-client";
 const socketContext = createContext(null);
 
 export const SocketProvider = ({children}) => {
-//    const backendURL = "https://peer-server-bho4.onrender.com"
-    const backendURL = "http://localhost:8001"
+    const backendURL = process.env.REACT_APP_SERVER;
     const socket = useMemo(() => io(backendURL), [backendURL]);
 
     return (
