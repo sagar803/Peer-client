@@ -19,6 +19,7 @@ export const Room = ({user}) => {
     const [connected, setConnected] = useState(false);
     const [onlineUsers, setOnlineUsers] = useState({});
     const [connectedUser, setConnectedUser] = useState({});
+    const [calling, setCalling] = useState(false);
     if(!user) navigate('/');
     
     useEffect(() => {
@@ -48,6 +49,7 @@ export const Room = ({user}) => {
   
     const handleCallUser = useCallback(async (user) => {
       const remoteSocketId = user.socketId;
+      setCalling(user.socketId);
 /*
       const sendChannel = peer.createDataChannel('channel');
       peer.channel = sendChannel;
@@ -168,7 +170,7 @@ export const Room = ({user}) => {
                       <h1>Seamless Connections, Anytime, Anywhere! 🚀 </h1>
                     </div>
                     <div className={styles.userListContainer}>
-                      <OnlineUserList onlineUsers={onlineUsers} handleCallUser={handleCallUser}/>
+                      <OnlineUserList calling={calling} onlineUsers={onlineUsers} handleCallUser={handleCallUser}/>
                     </div>
                 </div>
               </>

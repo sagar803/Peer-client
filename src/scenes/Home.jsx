@@ -10,6 +10,7 @@ export const Home = ({setUser}) => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState({});
   const inputRef = useRef();
+  const [loading, setLoading] = useState();
 
   useEffect(() => {
     inputRef.current.focus();
@@ -26,7 +27,7 @@ export const Home = ({setUser}) => {
   
   const handleLogin = (e) => {
     e.preventDefault();
-
+    setLoading(true);
     if (error.email === '' && error.name === '') {
       socket.emit('login', { name, email });
     }
@@ -34,6 +35,7 @@ export const Home = ({setUser}) => {
 
   const handleRoomJoined = (data) => {
     setUser(data);
+    setLoading(false);
     navigate("/room");
   };
 
@@ -70,9 +72,19 @@ export const Home = ({setUser}) => {
         />
         {error.email && <div className="error-message">{error.email}</div>}
         <button className="home-button" onClick={handleLogin}>
-          Login
+          {loading ? <Loader /> : "Login"}
         </button>
       </form>
     </div>
   );
 };
+
+const Loader = () => {
+  return (
+    <div class="loader">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </div>
+  )
+}
