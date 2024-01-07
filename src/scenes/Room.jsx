@@ -70,6 +70,11 @@ export const Room = ({user}) => {
         }
       */
       await new Promise(resolve => setTimeout(resolve, 1000));
+        /*
+        In the context of the await keyword, it does pause the execution of the function in which it is used. 
+        However, it doesn't block the entire JavaScript runtime or prevent other parts of your application from running. 
+        The rest of your application, outside the scope of the handleCallUser function, can continue executing while this function is waiting.
+        */
       socket.emit('call_user', { to: remoteSocketId, offer: peer.localDescription });
     }, [socket]);
 
